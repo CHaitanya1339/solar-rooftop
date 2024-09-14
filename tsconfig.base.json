@@ -1,0 +1,44 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@spartan-ng/ui-accordion-helm": [
+        "./components/ui-accordion-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-button-helm": [
+        "./components/ui-button-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-card-helm": [
+        "./components/ui-card-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-input-helm": [
+        "./components/ui-input-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-icon-helm": [
+        "./components/ui-icon-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-formfield-helm": [
+        "./components/ui-formfield-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-typography-helm": [
+        "components/ui-typography-helm/src/index.ts"
+      ],
+      "@spartan-ng/ui-table-helm": [
+        "components/ui-table-helm/src/index.ts"
+      ]
+    }
+  }
+}
