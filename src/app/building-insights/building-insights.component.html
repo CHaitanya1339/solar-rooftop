@@ -49,6 +49,17 @@
           <p class="mt-1 text-gray-300">102%</p>
         </div>
       </div>
+      <div class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-800">
+        <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg bg-gray-800">
+          <svg class="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h4V4H4v2zm0 6h4v-2H4v2zm0 6h4v-2H4v2zM10 6h4V4h-4v2zm0 6h4v-2h-4v2zm0 6h4v-2h-4v2zM16 6h4V4h-4v2zm0 6h4v-2h-4v2zm0 6h4v-2h-4v2z" />
+          </svg>
+        </div>
+        <div>
+          <span class="font-semibold text-white">Max Panel Count</span>
+          <p class="mt-1 text-gray-300">{{buildingInsights.solarPotential.maxArrayPanelsCount}} panels</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -115,106 +126,5 @@
       </dl>
     </div>
   </div>
-  <hlm-table>
-    <hlm-caption>Solar Panel Configuration Details</hlm-caption>
-    <hlm-trow>
-      <hlm-th>Type</hlm-th>
-      <hlm-th>Value</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Yearly Energy</hlm-th>
-      <hlm-th>{{(panelConfig?.yearlyEnergyDcKwh * panelCapacityRatio / 1000).toFixed(2)}} MWh</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Panels Count</hlm-th>
-      <hlm-th>{{panelCount}} panels</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Max Panel</hlm-th>
-      <hlm-th>{{buildingInsights.solarPotential.solarPanels.length}}</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Panel Capacity</hlm-th>
-      <hlm-th>{{panelCapacityWattsInput}}</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Annual Sunshine</hlm-th>
-      <hlm-th>{{buildingInsights.solarPotential.maxSunshineHoursPerYear}}</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>Roof area</hlm-th>
-      <hlm-th>{{buildingInsights.solarPotential.wholeRoofStats.areaMeters2}}</hlm-th>
-    </hlm-trow>
-    <hlm-trow>
-      <hlm-th>CO2 Savings</hlm-th>
-      <hlm-th>{{buildingInsights.solarPotential.carbonOffsetFactorKgPerMwh}}</hlm-th>
-    </hlm-trow>
-  </hlm-table>
-
-
-  <p-slider [(ngModel)]="panelCount" [min]="1" [max]="buildingInsights.solarPotential.maxArrayPanelsCount" styleClass="mb-4" [step]="1" (onChange)="setSolarPanels()"></p-slider>
-
-  <p class="text-center">Selected Panels: {{panelCount}}</p>
-
-
-  <p class="fw-light fs-4 mt-3 text-center">Solar Potential Analysis</p>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-        <th scope="col">Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Yearly Energy</td>
-        <td> kWh</td>
-      </tr>
-      <tr>
-        <td>Installation Size</td>
-        <td>kW</td>
-      </tr>
-      <tr>
-        <td>Installtion Cost</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Energy Covered</td>
-        <td>%</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p class="fw-light fs-4 mt-3 text-center">Cost Analysis for 20 years</p>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th scope="col">Type</th>
-        <th scope="col">Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Cost without solar</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Cost with solar</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Savings</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Break Even</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>Monthy average bill</td>
-        <td>$300</td>
-      </tr>
-    </tbody>
-  </table>
 </ng-container>
 </div>
