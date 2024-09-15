@@ -9,8 +9,15 @@
       class="text-white"
     ></app-search-bar>
 
-    <div class="row">
-      <div class="w-100" style="height: 60vh;" #mapElement></div>
+    <div class="row flex">
+      <!-- Map Element -->
+      <div class="w-2/3" style="height: 70vh;" #mapElement></div>
+
+      <!-- Panel Information Block -->
+      <div class="w-1/3 pl-4">
+        <app-data-layers></app-data-layers>
+      </div>
+
     </div>
 
     <div class="row">

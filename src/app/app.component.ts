@@ -8,12 +8,14 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { BuildingInsightsResponse } from './shared/interfaces/solar.interface';
 import { BuildingInsightsComponent } from './building-insights/building-insights.component';
 import { HlmH1Directive } from '@spartan-ng/ui-typography-helm';
+import { CommonModule } from '@angular/common';
+import { DataLayersComponent } from "./data-layers/data-layers.component";
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, GoogleMap, ButtonModule, SearchBarComponent, BuildingInsightsComponent, HlmH1Directive],
+  imports: [RouterOutlet, GoogleMap, ButtonModule, SearchBarComponent, BuildingInsightsComponent, HlmH1Directive, CommonModule, DataLayersComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -44,6 +46,32 @@ export class AppComponent implements OnInit {
     this.renderer.addClass(document.body, 'dark');
   }
 
+
+  selectedLayer: string = 'no-layer';
+  monthValue: number = 1;
+  hourValue: number = 0;
+
+  layerOptions = [
+    { value: 'no-layer', label: 'No layer' },
+    { value: 'roof-mask', label: 'Roof mask' },
+    { value: 'dsm', label: 'Digital Surface Model' },
+    { value: 'aerial-image', label: 'Aerial image' },
+    { value: 'annual-sunshine', label: 'Annual sunshine' },
+    { value: 'monthly-sunshine', label: 'Monthly sunshine' },
+    { value: 'hourly-shade', label: 'Hourly shade' }
+  ];
+
+  onLayerChange(event: Event): void {
+    this.selectedLayer = (event.target as HTMLSelectElement).value;
+  }
+
+  onMonthChange(event: Event): void {
+    this.monthValue = parseInt((event.target as HTMLInputElement).value);
+  }
+
+  onHourChange(event: Event): void {
+    this.hourValue = parseInt((event.target as HTMLInputElement).value);
+  }
   // Load Google Maps with required libraries
   loadGoogleMaps() {
     const loader = new Loader({

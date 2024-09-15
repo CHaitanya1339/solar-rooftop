@@ -7,6 +7,11 @@ import { panelsPalette } from './../shared/utils/colors';
 import { FormsModule } from '@angular/forms'; 
 import { SliderModule } from 'primeng/slider'; 
 import { HlmH2Directive } from '@spartan-ng/ui-typography-helm';
+import { ChartData, ChartOptions } from 'chart.js';
+import { ChartModule } from 'primeng/chart';
+
+
+import 'chartjs-plugin-annotation';
 
 import {
   HlmCaptionComponent,
@@ -25,7 +30,7 @@ import {
     HlmTableComponent,
     HlmTdComponent,
     HlmThComponent,
-    HlmTrowComponent],
+    HlmTrowComponent, ChartModule],
   templateUrl: './building-insights.component.html',
   styleUrl: './building-insights.component.scss'
 })
@@ -40,6 +45,8 @@ export class BuildingInsightsComponent implements OnInit {
   @Input('geometryLibrary') geometryLibrary!: google.maps.GeometryLibrary;
   @Input('location') location!: google.maps.LatLng;
   @Input('map') map!: google.maps.Map;
+  data: any;
+  options: any;
 
   icon = 'home';
   title = 'Building Insights endpoint';
@@ -59,18 +66,61 @@ export class BuildingInsightsComponent implements OnInit {
   panelCapacityWattsInput = 250;
   energyCostPerKwhInput = 0.31;
   dcToAcDerateInput = 0.85;
-
   // Slider settings
   panelCount: number = 30; // Default value for the slider
 
   // Find the config that covers the yearly energy consumption.
   yearlyKwhEnergyConsumption!: number;
-
-  constructor(private buildingInsightsService: BuildingInsightsService) { }
+  
+  constructor(private buildingInsightsService: BuildingInsightsService ) { }
 
   ngOnInit() {
     // Automatically call the function to set panels when the component initializes
     this.setSolarPanels();
+     this.data = {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [
+        {
+          label: 'Cost with Solar',
+          data: [80, 75, 70, 65, 60, 55, 50, 55, 60, 65, 70, 75],
+          fill: false,
+          borderColor: '#4bc0c0'
+        },
+        {
+          label: 'Cost without Solar',
+          data: [100, 105, 110, 115, 120, 125, 130, 135, 130, 125, 120, 115],
+          fill: false,
+          borderColor: '#565656'
+        }
+      ]
+    };
+
+    this.options = {
+      responsive: true,
+      title: {
+        display: true,
+        text: 'Monthly Energy Costs: Solar vs Non-Solar'
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Month'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Cost ($)'
+          },
+          suggestedMin: 0,
+          suggestedMax: 150
+        }
+      }
+    };
+  
+
+    
   }
 
   ngOnChanges() {
@@ -78,7 +128,7 @@ export class BuildingInsightsComponent implements OnInit {
       // console.log(this.location.lat(), this.location.lng());
       this.buildingInsightsService.findClosestBuilding(this.location, this.googleMapsApiKey).subscribe(res => {
         this.buildingInsights = res;
-
+        console.log(this.buildingInsights);
         if (!this.configId) {
           this.defaultPanelCapacity = this.buildingInsights.solarPotential.panelCapacityWatts;
           this.yearlyKwhEnergyConsumption = (this.monthlyAverageEnergyBillInput / this.energyCostPerKwhInput) * 12;
@@ -107,6 +157,7 @@ export class BuildingInsightsComponent implements OnInit {
     this.configId = configId;
     this.panelConfig = this.buildingInsights.solarPotential.solarPanelConfigs[this.configId];
   }
+  
 
   setSolarPanels() {
     if (!this.buildingInsights || !this.buildingInsights.solarPotential) return;
