@@ -1,5 +1,5 @@
 <!-- solar-data-panel.component.html -->
-<div class="bg-dark text-white">
+<div class="bg-dark text-white" *ngIf="!showErrorLayer && !showLoader">
   <ng-container *ngIf="configId">
     <!-- Top Section: Sunshine, Roof Area, CO2 Savings -->
     <div class="bg-dark py-12 sm:py-16">
@@ -39,7 +39,7 @@
               </div>
               <div>
                 <span class="font-semibold text-white">Yearly energy</span>
-                <p class="text-gray-400">{{(panelConfig?.yearlyEnergyDcKwh * panelCapacityRatio / 1000).toFixed(2)}} MWh</p>
+                <p class="text-gray-400">{{yearlyEnergy.toFixed(2)}} MWh</p>
               </div>
             </div>
             <div class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-800">
@@ -50,7 +50,7 @@
               </div>
               <div>
                 <span class="font-semibold text-white">Installation size</span>
-                <p class="text-gray-400">{{(panelCount * panelCapacityWattsInput / 1000).toFixed(2)}} kW</p>
+                <p class="text-gray-400">{{installationSizeKw}} kW</p>
               </div>
             </div>
             <div class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-800">
@@ -61,18 +61,7 @@
               </div>
               <div>
                 <span class="font-semibold text-white">Installation cost</span>
-                <p class="text-gray-400">${{(panelCount * panelCapacityWattsInput * installationCostPerWatt).toFixed(2)}}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-800">
-              <div class="flex-shrink-0 w-11 h-11 flex items-center justify-center rounded-lg bg-gray-800">
-                <svg class="w-6 h-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 10.5h.375c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125H21M4.5 10.5h6.75V15H4.5v-4.5zM3.75 18h15A2.25 2.25 0 0021 15.75v-6a2.25 2.25 0 00-2.25-2.25h-15A2.25 2.25 0 001.5 9.75v6A2.25 2.25 0 003.75 18z" />
-                </svg>
-              </div>
-              <div>
-                <span class="font-semibold text-white">Energy covered</span>
-                <p class="mt-1 text-gray-300">102%</p>
+                <p class="text-gray-400">${{installationCostTotal}}</p>
               </div>
             </div>
             <div class="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-800">
@@ -89,77 +78,91 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Right Container: Slider and Inputs -->
       <div class="w-1/2 bg-gray-900 rounded-3xl shadow-lg ring-1 ring-gray-800 p-4">
         <div class="space-y-6">
           <div>
             <label for="panel-count-slider" class="block text-sm font-medium text-gray-400 mb-2">Panel Count: {{panelCount}}</label>
-            <input 
-              type="range" 
+            <input
+              type="range"
               [(ngModel)]="panelCount"
               [min]="1"
               [max]="buildingInsights.solarPotential.maxArrayPanelsCount"
               [step]="1"
-              (change)="setSolarPanels()"
+              (change)="updateCalculations()"
+              [disabled]="true"
               class="w-full bg-gray-700 rounded-lg appearance-none cursor-pointer"
               id="panel-count-slider"
             >
           </div>
-      
+
           <div class="space-y-4">
             <div>
               <label for="monthly-bill" class="block text-sm font-medium text-gray-400 mb-1">Monthly average energy bill ($)</label>
-              <input type="number" id="monthly-bill" [(ngModel)]="monthlyAverageEnergyBillInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2">
+              <input type="number" id="monthly-bill" [(ngModel)]="monthlyAverageEnergyBillInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2" (input)="updateCalculations()">
             </div>
             <div>
               <label for="energy-cost" class="block text-sm font-medium text-gray-400 mb-1">Energy cost per kWh ($)</label>
-              <input type="number" id="energy-cost" [(ngModel)]="energyCostPerKwhInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2">
+              <input type="number" id="energy-cost" [(ngModel)]="energyCostPerKwhInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2" (input)="updateCalculations()">
             </div>
             <div>
               <label for="solar-incentives" class="block text-sm font-medium text-gray-400 mb-1">Solar incentives ($)</label>
-              <input type="number" id="solar-incentives" [(ngModel)]="solarIncentives" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2">
+              <input type="number" id="solar-incentives" [(ngModel)]="solarIncentives" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2" (input)="updateCalculations()">
             </div>
             <div>
               <label for="installation-cost" class="block text-sm font-medium text-gray-400 mb-1">Installation cost per Watt ($)</label>
-              <input type="number" id="installation-cost" [(ngModel)]="installationCostPerWatt" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2">
+              <input type="number" id="installation-cost" [(ngModel)]="installationCostPerWatt" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2" (input)="updateCalculations()">
             </div>
             <div>
               <label for="panel-capacity" class="block text-sm font-medium text-gray-400 mb-1">Panel capacity (Watts)</label>
-              <input type="number" id="panel-capacity" [(ngModel)]="panelCapacityWattsInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2">
+              <input type="number" id="panel-capacity" [(ngModel)]="panelCapacityWattsInput" class="w-full bg-gray-800 rounded-md border-gray-700 text-white px-3 py-2" (input)="updateCalculations()">
             </div>
           </div>
         </div>
       </div>
-      
+
           </div>
-          <div class="mt-8 bg-gray-900 rounded-3xl shadow-lg ring-1 ring-gray-800 p-4">
-            <h3 class="text-xl font-semibold mb-4 text-white">Cost Comparison for 20 years</h3>
-            
-            <!-- Full width chart with reduced height -->
-            <div class="mb-4">
-              <p-chart type="line" [data]="data" [options]="options" style="height: 250px;"></p-chart>
-            </div>
-            
-            <!-- Flex container for cost details -->
-            <div class="flex justify-between mb-4">
-              <div>
-                <p class="text-gray-400">Cost without solar</p>
-                <p class="text-2xl font-bold text-white">$61,305.29</p>
-              </div>
-              <div>
-                <p class="text-gray-400">Cost with solar</p>
-                <p class="text-2xl font-bold text-green-500">$3,229.31</p>
-              </div>
-              <div>
-                <p class="text-gray-400">Savings</p>
-                <p class="text-2xl font-bold text-yellow-500">$58,075.98</p>
-              </div>
-              <div>
-                <p class="text-gray-400">Break even</p>
-                <p class="text-2xl font-bold text-white">2025 in 1 year</p>
-              </div>
+          <div class="bg-dark py-12 sm:py-16">
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+              <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+                <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                  <dt class="text-base leading-7 text-white-600 value-text">Cost without Solar</dt>
+                  <dd class="order-first text-3xl font-semibold tracking-tight text-white-900 sm:text-5xl">
+                    ${{totalCostWithoutSolar.toFixed(2)}}
+                  </dd>
+                </div>
+                <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                  <dt class="text-base leading-7 text-white-600 value-text">Cost with Solar</dt>
+                  <dd class="order-first text-3xl font-semibold tracking-tight text-white-900 sm:text-5xl">
+                    ${{totalCostWithSolar.toFixed(2)}}
+                  </dd>
+                </div>
+                <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+                  <dt class="text-base leading-7 text-white-600 value-text">Savings</dt>
+                  <dd class="order-first text-3xl font-semibold tracking-tight text-white-900 sm:text-5xl">
+                    ${{(totalCostWithoutSolar - totalCostWithSolar).toFixed(2)}}
+                  </dd>
+                </div>
+              </dl>
             </div>
           </div>
         </ng-container>
       </div>
+
+<div *ngIf="showErrorLayer">
+  <main class="grid min-h-full place-items-center bg-black px-6 py-24 sm:py-32 lg:px-8">
+    <div class="text-center">
+      <p class="text-base font-semibold text-indigo-600">404</p>
+      <h1 class="mt-4 text-3xl font-bold tracking-tight text-black-900 sm:text-5xl">buildingInsights not found</h1>
+      <p class="mt-6 text-base leading-7 text-black-600">We'll be back soon at your location, Stay tuned!</p>
+      <div class="mt-10 flex items-center justify-center gap-x-6">
+        <a (click)="goBack()" class="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Go back</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div *ngIf="showLoader">
+  <div class="loader"></div>
+</div>
